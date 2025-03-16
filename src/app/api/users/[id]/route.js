@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+//import { PrismaClient } from "@prisma/client";
+import prisma from "@/lib/prisma";
 
-const prisma = new PrismaClient();
+//const prisma = new PrismaClient();
 
 /** 📌 GET: Fetch a User by ID */
 export async function GET(req, { params }) {
