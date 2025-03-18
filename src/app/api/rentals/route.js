@@ -45,3 +45,25 @@ export async function POST(req) {
     );
   }
 }
+
+/** 📌 GET: Fetch Upcoming Rentals */
+export async function GET(req) {
+  try {
+    const rentals = await prisma.rental.findMany({
+      where: {
+        returnDate: {
+          gte: new Date(), // Fetch rentals where returnDate is in the future
+        },
+      },
+      orderBy: { pickupDate: "asc" }, // Sort by pickup date (earliest first)
+    });
+
+    return NextResponse.json(rentals, { status: 200 });
+  } catch (error) {
+    console.error("Error fetching rentals:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch rentals" },
+      { status: 500 }
+    );
+  }
+}
