@@ -82,45 +82,64 @@ export default function UpcomingAppointments() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 p-4 sm:p-6">
       <Navbar />
       <div className="container mx-auto p-6">
-        <h2 className="text-3xl font-bold mb-4 text-center">
+        {/* Title */}
+        <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-center">
           Upcoming Appointments
         </h2>
 
         {/* Back Button */}
-        <Link href="/" className="text-blue-500 underline mb-4 inline-block">
-          ← Back to Home
-        </Link>
+        <div className="flex justify-center mb-4">
+          <Link href="/" className="text-blue-500 hover:underline">
+            ← Back to Home
+          </Link>
+        </div>
 
         {/* List of Upcoming Appointments */}
-        {appointments.length === 0 ? (
-          <p className="text-gray-500 text-center">No upcoming appointments.</p>
-        ) : (
-          <ul className="space-y-2">
-            {appointments.map((appointment) => (
-              <li
-                key={appointment.id}
-                className="border p-3 rounded bg-white shadow"
-              >
-                <div className="flex-1">
-                  <strong>{appointment.name}</strong> - {appointment.contact}
-                  <br />
-                  Date: {new Date(appointment.date).toLocaleDateString()}
-                  <br />
-                  Time: {appointment.time}
-                </div>
-                <button
-                  className="bg-yellow-500 text-white px-3 py-2 rounded hover:bg-yellow-600 ml-2"
-                  onClick={() => setEditingAppointment(appointment)}
+        <div className="bg-white p-4 rounded-lg shadow-lg max-w-3xl mx-auto">
+          {appointments.length === 0 ? (
+            <p className="text-gray-500 text-center">
+              No upcoming appointments.
+            </p>
+          ) : (
+            <ul className="space-y-3">
+              {appointments.map((appointment) => (
+                <li
+                  key={appointment.id}
+                  className="border p-3 rounded bg-gray-50 shadow-md flex flex-col sm:flex-row justify-between items-start sm:items-center"
                 >
-                  Edit
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
+                  {/* Appointment Details */}
+                  <div className="flex-1 w-full sm:w-auto">
+                    <p className="text-lg font-semibold text-gray-800">
+                      {appointment.name}
+                    </p>
+                    <p className="text-gray-600">
+                      <strong>Contact:</strong> {appointment.contact}
+                    </p>
+                    <p className="text-gray-600">
+                      <strong>Date:</strong>{" "}
+                      {new Date(appointment.date).toLocaleDateString()}
+                    </p>
+                    <p className="text-gray-600">
+                      <strong>Time:</strong> {appointment.time}
+                    </p>
+                  </div>
+                  {/* Action Buttons */}
+                  <div className="flex flex-col sm:flex-row gap-2 mt-3 sm:mt-0">
+                    <button
+                      className="bg-yellow-500 text-white px-3 py-2 rounded hover:bg-yellow-600 w-full sm:w-auto"
+                      onClick={() => setEditingAppointment(appointment)}
+                    >
+                      Edit
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
       {/* ✅ Edit Appointment Modal */}
       <Modal

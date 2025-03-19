@@ -71,16 +71,21 @@ export default function ForReturn() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div className="min-h-screen bg-gray-100 p-4 sm:p-6">
       <Navbar />
-      <h2 className="text-3xl font-bold mb-4 text-center">For Return</h2>
+      <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-center">
+        For Return
+      </h2>
 
       {/* Back Button */}
-      <Link href="/" className="text-blue-500 underline mb-4 inline-block">
-        ← Back to Home
-      </Link>
+      {/* Back Button */}
+      <div className="flex justify-center mb-4">
+        <Link href="/" className="text-blue-500 hover:underline">
+          ← Back to Home
+        </Link>
+      </div>
 
-      <div className="bg-white p-4 rounded-lg shadow">
+      <div className="bg-white p-4 rounded-lg shadow-lg max-w-3xl mx-auto">
         {rentals.length === 0 ? (
           <p className="text-gray-500 text-center">No items for return.</p>
         ) : (
@@ -88,32 +93,40 @@ export default function ForReturn() {
             {rentals.map((rental) => (
               <li
                 key={rental.id}
-                className="border p-3 rounded flex justify-between items-center"
+                className="border p-3 rounded bg-gray-50 shadow-md flex flex-col sm:flex-row justify-between items-start sm:items-center"
               >
-                <div className="flex-1">
-                  <strong>Gown:</strong> {rental.gownDesc}
-                  <br />
-                  <strong>Return Date:</strong>{" "}
-                  {new Date(rental.returnDate).toLocaleDateString()}
-                  <br />
-                  <strong>Name:</strong> {rental.name}
-                  <br />
-                  <strong>Contact:</strong> {rental.contact}
+                {/* Gown Details */}
+                <div className="flex-1 w-full sm:w-auto">
+                  <p className="text-lg font-semibold text-gray-800">
+                    <strong>Gown:</strong> {rental.gownDesc}
+                  </p>
+                  <p className="text-gray-600">
+                    <strong>Return Date:</strong>{" "}
+                    {new Date(rental.returnDate).toLocaleDateString()}
+                  </p>
+                  <p className="text-gray-600">
+                    <strong>Name:</strong> {rental.name}
+                  </p>
+                  <p className="text-gray-600">
+                    <strong>Contact:</strong> {rental.contact}
+                  </p>
                 </div>
 
-                <button
-                  className="bg-blue-500 text-white px-3 py-2 rounded hover:bg-blue-600 ml-2"
-                  onClick={() => handleRevertPickup(rental.id)}
-                >
-                  Back to Not Picked Up
-                </button>
-
-                <button
-                  className="bg-green-500 text-white px-3 py-2 rounded hover:bg-green-600 ml-2"
-                  onClick={() => handleMarkAsReturned(rental.id)}
-                >
-                  Done
-                </button>
+                {/* Action Buttons */}
+                <div className="flex flex-col sm:flex-row gap-2 mt-3 sm:mt-0">
+                  <button
+                    className="bg-blue-500 text-white px-3 py-2 rounded hover:bg-blue-600 w-full sm:w-auto"
+                    onClick={() => handleRevertPickup(rental.id)}
+                  >
+                    Back to Not Picked Up
+                  </button>
+                  <button
+                    className="bg-green-500 text-white px-3 py-2 rounded hover:bg-green-600 w-full sm:w-auto"
+                    onClick={() => handleMarkAsReturned(rental.id)}
+                  >
+                    Returned
+                  </button>
+                </div>
               </li>
             ))}
           </ul>

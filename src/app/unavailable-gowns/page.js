@@ -25,17 +25,21 @@ export default function UnavailableGowns() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div className="min-h-screen bg-gray-100 p-4 sm:p-6">
       <Navbar />
-      <h2 className="text-3xl font-bold mb-4 text-center">Unavailable Gowns</h2>
+      <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-center">
+        Unavailable Gowns
+      </h2>
 
       {/* Back Button */}
-      <Link href="/" className="text-blue-500 underline mb-4 inline-block">
-        ← Back to Home
-      </Link>
+      <div className="flex justify-center mb-4">
+        <Link href="/" className="text-blue-500 hover:underline">
+          ← Back to Home
+        </Link>
+      </div>
 
       {/* List of Unavailable Gowns */}
-      <div className="bg-white p-4 rounded-lg shadow">
+      <div className="bg-white p-4 rounded-lg shadow-lg max-w-3xl mx-auto">
         {unavailableGowns.length === 0 ? (
           <p className="text-gray-500 text-center">No unavailable gowns.</p>
         ) : (
@@ -43,17 +47,21 @@ export default function UnavailableGowns() {
             {unavailableGowns.map((rental) => (
               <li
                 key={rental.id}
-                className="border p-3 rounded bg-white shadow"
+                className="border p-3 rounded bg-gray-50 shadow-md"
               >
-                <p>
+                <p className="text-lg font-semibold text-gray-800">
                   <strong>Gown:</strong> {rental.gownDesc}
                 </p>
-                <p>
+                <p className="text-gray-600">
                   <strong>Duration:</strong>{" "}
                   {new Date(rental.pickupDate).toLocaleDateString()} -{" "}
                   {new Date(rental.returnDate).toLocaleDateString()}
                 </p>
-                <p>
+                <p
+                  className={`font-semibold ${
+                    rental.isPickedUp ? "text-red-500" : "text-green-500"
+                  }`}
+                >
                   <strong>Status:</strong>{" "}
                   {rental.isPickedUp
                     ? "Currently Rented"

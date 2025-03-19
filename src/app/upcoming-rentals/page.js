@@ -98,62 +98,79 @@ export default function UpcomingRentals() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <h2 className="text-3xl font-bold mb-4 text-center">Upcoming Rentals</h2>
+    <div className="min-h-screen bg-gray-100 p-4 sm:p-6">
+      {/* Title */}
+      <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-center">
+        Upcoming Rentals
+      </h2>
 
       {/* Back Button */}
-      <Link href="/" className="text-blue-500 underline mb-4 inline-block">
-        ← Back to Home
-      </Link>
+      <div className="flex justify-center mb-4">
+        <Link href="/" className="text-blue-500 hover:underline">
+          ← Back to Home
+        </Link>
+      </div>
 
       {/* Rentals List */}
-      <div className="bg-white p-4 rounded-lg shadow">
+      <div className="bg-white p-4 rounded-lg shadow-lg max-w-3xl mx-auto">
         {rentals.length === 0 ? (
-          <p className="text-gray-500">No upcoming rentals.</p>
+          <p className="text-gray-500 text-center">No upcoming rentals.</p>
         ) : (
           <ul className="space-y-3">
             {rentals.map((rental) => (
               <li
                 key={rental.id}
-                className="border p-3 rounded flex justify-between items-center"
+                className="border p-3 rounded bg-gray-50 shadow-md flex flex-col sm:flex-row justify-between items-start sm:items-center"
               >
                 <div
                   onClick={() => setSelectedRental(rental)}
-                  className="flex-1 cursor-pointer"
+                  className="flex-1 cursor-pointer w-full sm:w-auto"
                 >
-                  <strong>{rental.name}</strong> - Pickup:{" "}
-                  {new Date(rental.pickupDate).toLocaleDateString()} | Return:{" "}
-                  {new Date(rental.returnDate).toLocaleDateString()}
-                  <br />
-                  <strong>Item/s: </strong>
-                  {rental.gownDesc}
-                  <br />
-                  <strong>Balance:</strong> ₱
-                  {parseFloat(rental.totalAmount) -
-                    parseFloat(rental.downPayment)}
+                  <p className="text-lg font-semibold text-gray-800">
+                    {rental.name}
+                  </p>
+                  <p className="text-gray-600">
+                    <strong>Pickup:</strong>{" "}
+                    {new Date(rental.pickupDate).toLocaleDateString()}
+                  </p>
+                  <p className="text-gray-600">
+                    <strong>Return:</strong>{" "}
+                    {new Date(rental.returnDate).toLocaleDateString()}
+                  </p>
+                  <p className="text-gray-600">
+                    <strong>Item/s:</strong> {rental.gownDesc}
+                  </p>
+                  <p className="text-gray-600">
+                    <strong>Balance:</strong> ₱
+                    {parseFloat(rental.totalAmount) -
+                      parseFloat(rental.downPayment)}
+                  </p>
                 </div>
 
-                <button
-                  className="bg-yellow-500 text-white px-3 py-2 rounded hover:bg-yellow-600 ml-2"
-                  onClick={() => setEditingRental(rental)}
-                >
-                  Edit
-                </button>
-
-                <button
-                  className="bg-green-500 text-white px-3 py-2 rounded hover:bg-green-600"
-                  onClick={(e) => {
-                    e.stopPropagation(); // Prevent modal from opening
-                    handleMarkAsPickedUp(rental.id);
-                  }}
-                >
-                  Done
-                </button>
+                {/* Action Buttons */}
+                <div className="flex flex-col sm:flex-row gap-2 mt-3 sm:mt-0">
+                  <button
+                    className="bg-yellow-500 text-white px-3 py-2 rounded hover:bg-yellow-600 w-full sm:w-auto"
+                    onClick={() => setEditingRental(rental)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="bg-green-500 text-white px-3 py-2 rounded hover:bg-green-600 w-full sm:w-auto"
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent modal from opening
+                      handleMarkAsPickedUp(rental.id);
+                    }}
+                  >
+                    Done
+                  </button>
+                </div>
               </li>
             ))}
           </ul>
         )}
       </div>
+
       {/* ✅ Rental Details Modal */}
       <Modal
         isOpen={selectedRental !== null}

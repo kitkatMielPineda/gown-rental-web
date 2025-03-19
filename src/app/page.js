@@ -221,45 +221,45 @@ export default function Home() {
     <div className="min-h-screen bg-gray-100">
       <Navbar />
       <div className="container mx-auto p-6">
-        <h2 className="text-3xl font-bold mb-4 text-center">
-          Welcome to Gown Rental
+        <h2 className="text-3xl font-bold mb-6 text-center">
+          Welcome to Keith's Gown Rental
         </h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-center">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 text-center">
           <button
-            className="bg-blue-500 text-white py-3 rounded-lg shadow hover:bg-blue-600"
+            className="bg-blue-500 text-white py-3 px-4 rounded-lg shadow hover:bg-blue-600"
             onClick={() => setIsScheduleTypeModalOpen(true)}
           >
             Add Schedule
           </button>
           <button
-            className="bg-green-500 text-white py-3 rounded-lg shadow hover:bg-green-600"
+            className="bg-green-500 text-white py-3 px-4 rounded-lg shadow hover:bg-green-600"
             onClick={() => (window.location.href = "/upcoming-rentals")}
           >
             Upcoming Rentals
           </button>
           <button
-            className="bg-yellow-500 text-white py-3 rounded-lg shadow hover:bg-yellow-600"
+            className="bg-yellow-500 text-white py-3 px-4 rounded-lg shadow hover:bg-yellow-600"
             onClick={() => (window.location.href = "/upcoming-appointments")}
           >
             Upcoming Appointments
           </button>
           <button
-            className="bg-gray-500 text-white py-3 rounded-lg shadow hover:bg-gray-600"
+            className="bg-gray-500 text-white py-3 px-4 rounded-lg shadow hover:bg-gray-600"
             onClick={handleQuickPreview}
           >
             Quick Preview
           </button>
           <button
-            className="bg-yellow-500 text-white py-3 rounded-lg shadow hover:bg-yellow-600"
+            className="bg-yellow-500 text-white py-3 px-4 rounded-lg shadow hover:bg-yellow-600"
             onClick={() => (window.location.href = "/for-return")}
           >
             For Return
           </button>
-          <button className="bg-red-500 text-white py-3 rounded-lg shadow hover:bg-red-600">
+          <button className="bg-red-500 text-white py-3 px-4 rounded-lg shadow hover:bg-red-600">
             Notifications
           </button>
           <button
-            className="bg-purple-500 text-white py-3 rounded-lg shadow hover:bg-purple-600"
+            className="bg-purple-500 text-white py-3 px-4 rounded-lg shadow hover:bg-purple-600"
             onClick={() => (window.location.href = "/unavailable-gowns")}
           >
             Unavailable Gowns
