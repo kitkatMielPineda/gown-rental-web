@@ -10,7 +10,7 @@ export default function Home() {
   const [userId, setUserId] = useState(null);
   const [isQuickPreviewOpen, setIsQuickPreviewOpen] = useState(false);
   const [quickPreviewRentals, setQuickPreviewRentals] = useState([]);
-  const [quickPreviewData, setQuickPreviewData] = useState([]);
+  const [unavailableTimes, setUnavailableTimes] = useState([]);
 
   //Rental form data
   const [formData, setFormData] = useState({
@@ -41,6 +41,27 @@ export default function Home() {
       setFormData((prevData) => ({ ...prevData, user: { id: storedUserId } }));
     }
   }, []);
+
+  useEffect(() => {
+    async function fetchUnavailableTimes() {
+      if (!appointmentForm.date) return; // Prevent fetching without a selected date
+
+      try {
+        const response = await fetch(
+          `/api/appointments?date=${appointmentForm.date}`
+        );
+        if (response.ok) {
+          const data = await response.json();
+          const takenTimes = data.map((appointment) => appointment.time);
+          setUnavailableTimes(takenTimes);
+        }
+      } catch (error) {
+        console.error("Error fetching unavailable times:", error);
+      }
+    }
+
+    fetchUnavailableTimes();
+  }, [appointmentForm.date]);
 
   // Handle form field changes
   const handleChange = (e) => {
@@ -164,22 +185,26 @@ export default function Home() {
       // Format & merge data
       const formattedRentals = rentals.map((rental) => ({
         type: "Rental",
-        date: new Date(rental.pickupDate),
-        details: `Rental: ${rental.gownDesc}`,
+        gownDesc: rental.gownDesc || "No Description", // Ensure it exists
+        date: new Date(rental.pickupDate), // Ensure it's a Date object
+        forRepair: rental.forRepair ?? false, // Ensure it defaults to false
       }));
 
       const formattedAppointments = appointments.map((appointment) => ({
         type: "Appointment",
         date: new Date(appointment.date),
-        details: `Appointment: ${new Date(appointment.date).toLocaleTimeString(
-          "en-US",
-          {
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: true,
-          }
-        )}`,
+        name: appointment.name || "No Name", // Ensure it exists
+        details: `Appointment: ${appointment.time}`, // Ensure updated time is shown
       }));
+      //   details: `Appointment: ${new Date(appointment.date).toLocaleTimeString(
+      //     "en-US",
+      //     {
+      //       hour: "2-digit",
+      //       minute: "2-digit",
+      //       hour12: true,
+      //     }
+      //   )}`,
+      // }));
 
       const combinedEvents = [...formattedRentals, ...formattedAppointments]
         .filter((event) => event.date >= today && event.date <= sevenDaysLater)
@@ -224,10 +249,19 @@ export default function Home() {
           >
             Quick Preview
           </button>
+          <button
+            className="bg-yellow-500 text-white py-3 rounded-lg shadow hover:bg-yellow-600"
+            onClick={() => (window.location.href = "/for-return")}
+          >
+            For Return
+          </button>
           <button className="bg-red-500 text-white py-3 rounded-lg shadow hover:bg-red-600">
             Notifications
           </button>
-          <button className="bg-purple-500 text-white py-3 rounded-lg shadow hover:bg-purple-600">
+          <button
+            className="bg-purple-500 text-white py-3 rounded-lg shadow hover:bg-purple-600"
+            onClick={() => (window.location.href = "/unavailable-gowns")}
+          >
             Unavailable Gowns
           </button>
         </div>
@@ -379,14 +413,54 @@ export default function Home() {
             onChange={handleAppointmentChange}
             required
           />
-          <input
-            type="time"
+          <select
             name="time"
             className="w-full p-2 border rounded"
             value={appointmentForm.time}
             onChange={handleAppointmentChange}
             required
-          />
+          >
+            <option value="">Select Time</option>
+            {[
+              "08:00 AM",
+              "08:30 AM",
+              "09:00 AM",
+              "09:30 AM",
+              "10:00 AM",
+              "10:30 AM",
+              "11:00 AM",
+              "11:30 AM",
+              "12:00 PM",
+              "12:30 PM",
+              "01:00 PM",
+              "01:30 PM",
+              "02:00 PM",
+              "02:30 PM",
+              "03:00 PM",
+              "03:30 PM",
+              "04:00 PM",
+              "04:30 PM",
+              "05:00 PM",
+              "05:30 PM",
+              "06:00 PM",
+              "06:30 PM",
+              "07:00 PM",
+              "07:30 PM",
+              "08:00 PM",
+              "08:30 PM",
+              "09:00 PM",
+              "09:30 PM",
+              "10:00 PM",
+            ].map((slot) => (
+              <option
+                key={slot}
+                value={slot}
+                disabled={unavailableTimes.includes(slot)}
+              >
+                {slot}
+              </option>
+            ))}
+          </select>
           <button
             type="submit"
             className="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600"
@@ -412,7 +486,9 @@ export default function Home() {
               <li key={index} className="border p-3 rounded bg-white shadow">
                 {event.type === "Rental" ? (
                   <>
-                    <strong>Rental: {event.gownDesc}</strong>
+                    <strong>Rental: </strong> <br />
+                    <span>Item/s: </span>
+                    {event.gownDesc}
                     <br />
                     <span>Date: {event.date.toLocaleDateString()}</span>
                     <br />
@@ -420,7 +496,7 @@ export default function Home() {
                   </>
                 ) : (
                   <>
-                    <strong>Appointment: {event.name}</strong>
+                    <strong>Appointment: </strong> {event.name}
                     <br />
                     <span>Date: {event.date.toLocaleDateString()}</span>
                     <br />

@@ -29,6 +29,8 @@ model Rental {
   forRepair   Boolean  @default(false)
   downPayment Decimal
   totalAmount Decimal
+  isPickedUp   Boolean @default(false)
+  isReturned Boolean @default(false)
   createdAt   DateTime @default(now())
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

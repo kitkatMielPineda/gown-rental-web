@@ -5,10 +5,9 @@ import prisma from "@/lib/prisma";
 export async function POST(req) {
   try {
     const body = await req.json();
-    console.log("Received Appointment Data:", body);
+    let { name, contact, date, time, userId } = body;
 
-    const { name, contact, date, time, userId } = body;
-
+    // ✅ Ensure all fields are provided
     if (!name || !contact || !date || !time || !userId) {
       return NextResponse.json(
         { error: "All fields are required" },
@@ -16,39 +15,26 @@ export async function POST(req) {
       );
     }
 
-    // Convert date into a Date object
+    // ✅ Convert `date` to a valid JavaScript Date object
     const appointmentDate = new Date(date);
-
-    // ✅ Check if there is already an appointment at the same date & time
-    const existingAppointment = await prisma.appointment.findFirst({
-      where: { date: appointmentDate, time },
-    });
-
-    if (existingAppointment) {
+    if (isNaN(appointmentDate.getTime())) {
       return NextResponse.json(
-        { error: "An appointment already exists at this time" },
+        { error: "Invalid date format" },
         { status: 400 }
       );
     }
 
-    // ✅ Check if the selected time is within 1 hour of any existing appointment
-    const oneHourBefore = new Date(appointmentDate);
-    oneHourBefore.setHours(oneHourBefore.getHours() - 1);
-
-    const oneHourAfter = new Date(appointmentDate);
-    oneHourAfter.setHours(oneHourAfter.getHours() + 1);
-
-    const conflictingAppointment = await prisma.appointment.findFirst({
+    // ✅ Check if the same date & time already exists
+    const existingAppointment = await prisma.appointment.findFirst({
       where: {
-        AND: [
-          { date: { gte: oneHourBefore, lte: oneHourAfter } }, // Within 1 hour gap
-        ],
+        date: appointmentDate, // Ensure only date is compared
+        time: time, // Ensure time is matched exactly
       },
     });
 
-    if (conflictingAppointment) {
+    if (existingAppointment) {
       return NextResponse.json(
-        { error: "An appointment must have a 1-hour gap" },
+        { error: "An appointment at this time is already booked!" },
         { status: 400 }
       );
     }
@@ -58,8 +44,8 @@ export async function POST(req) {
       data: {
         name,
         contact,
-        date: appointmentDate,
-        time, // ✅ Ensure `time` is stored properly
+        date: appointmentDate, // Save as a Date object
+        time,
         user: { connect: { id: userId } },
       },
     });
@@ -74,17 +60,46 @@ export async function POST(req) {
   }
 }
 
-/** 📌 GET: Fetch all upcoming appointments */
-export async function GET() {
+// /** 📌 GET: Fetch all upcoming appointments */
+// export async function GET(req) {
+//   try {
+//     const url = new URL(req.url);
+//     const date = url.searchParams.get("date");
+
+//     let filter = {};
+//     if (date) {
+//       filter.date = new Date(date);
+//     }
+
+//     const appointments = await prisma.appointment.findMany({
+//       where: filter,
+//       orderBy: { date: "asc" },
+//     });
+
+//     return NextResponse.json(appointments, { status: 200 });
+//   } catch (error) {
+//     console.error("Error fetching appointments:", error);
+//     return NextResponse.json(
+//       { error: "Failed to fetch appointments" },
+//       { status: 500 }
+//     );
+//   }
+// }
+
+/** 📌 GET: Fetch all upcoming appointments (Today & Future) */
+export async function GET(req) {
   try {
     const today = new Date();
+    today.setHours(0, 0, 0, 0); // Normalize today to start of the day
 
-    const upcomingAppointments = await prisma.appointment.findMany({
-      where: { date: { gte: today } },
-      orderBy: [{ date: "asc" }, { time: "asc" }], // Sort by nearest date & time
+    const appointments = await prisma.appointment.findMany({
+      where: {
+        date: { gte: today }, // Only fetch today and future dates
+      },
+      orderBy: { date: "asc" },
     });
 
-    return NextResponse.json(upcomingAppointments, { status: 200 });
+    return NextResponse.json(appointments, { status: 200 });
   } catch (error) {
     console.error("Error fetching appointments:", error);
     return NextResponse.json(
