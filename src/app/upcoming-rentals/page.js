@@ -8,9 +8,11 @@ export default function UpcomingRentals() {
   const [rentals, setRentals] = useState([]);
   const [selectedRental, setSelectedRental] = useState(null);
   const [editingRental, setEditingRental] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchRentals() {
+      setLoading(true); // ✅ Show loading before fetch
       try {
         const response = await fetch("/api/rentals");
         if (response.ok) {
@@ -21,32 +23,16 @@ export default function UpcomingRentals() {
 
           setRentals(filteredRentals);
         } else {
-          console.error("Failed to fetch rentals");
+          console.error("Failed to fetch rentals", response.json());
         }
       } catch (error) {
         console.error("Error fetching rentals:", error);
       }
+      setLoading(false); // ✅ Hide loading after fetch
     }
 
     fetchRentals();
   }, []);
-
-  //   const handleMarkAsReturned = async (id) => {
-  //     try {
-  //       const response = await fetch(`/api/rentals/${id}/return`, {
-  //         method: "PATCH",
-  //       });
-
-  //       if (response.ok) {
-  //         // ✅ Remove from list
-  //         setRentals(rentals.filter((rental) => rental.id !== id));
-  //       } else {
-  //         console.error("Failed to update return status");
-  //       }
-  //     } catch (error) {
-  //       console.error("Error updating return status:", error);
-  //     }
-  //   };
 
   const handleUpdateRental = async (id, updatedData) => {
     try {
@@ -113,7 +99,13 @@ export default function UpcomingRentals() {
 
       {/* Rentals List */}
       <div className="bg-white p-4 rounded-lg shadow-lg max-w-3xl mx-auto">
-        {rentals.length === 0 ? (
+        {loading ? ( // ✅ Show loading indicator
+          <p className="text-center text-gray-500">
+            <div className="flex justify-center">
+              <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+            </div>
+          </p>
+        ) : rentals.length === 0 ? (
           <p className="text-gray-500 text-center">No upcoming rentals.</p>
         ) : (
           <ul className="space-y-3">

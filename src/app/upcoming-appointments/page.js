@@ -8,9 +8,11 @@ export default function UpcomingAppointments() {
   const [appointments, setAppointments] = useState([]);
   const [editingAppointment, setEditingAppointment] = useState(null);
   const [unavailableTimes, setUnavailableTimes] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchAppointments = async () => {
+      setLoading(true);
       try {
         const response = await fetch("/api/appointments");
         const data = await response.json();
@@ -25,6 +27,7 @@ export default function UpcomingAppointments() {
       } catch (error) {
         console.error("Error fetching appointments:", error);
       }
+      setLoading(false);
     };
 
     fetchAppointments();
@@ -99,7 +102,13 @@ export default function UpcomingAppointments() {
 
         {/* List of Upcoming Appointments */}
         <div className="bg-white p-4 rounded-lg shadow-lg max-w-3xl mx-auto">
-          {appointments.length === 0 ? (
+          {loading ? ( // ✅ Show loading indicator
+            <p className="text-center text-gray-500">
+              <div className="flex justify-center">
+                <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+              </div>
+            </p>
+          ) : appointments.length === 0 ? (
             <p className="text-gray-500 text-center">
               No upcoming appointments.
             </p>

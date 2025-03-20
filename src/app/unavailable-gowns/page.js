@@ -5,9 +5,11 @@ import Navbar from "@/components/Navbar";
 
 export default function UnavailableGowns() {
   const [unavailableGowns, setUnavailableGowns] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchUnavailableGowns = async () => {
+      setLoading(true);
       try {
         const response = await fetch("/api/rentals/unavailable");
         if (response.ok) {
@@ -19,6 +21,7 @@ export default function UnavailableGowns() {
       } catch (error) {
         console.error("Error fetching unavailable gowns:", error);
       }
+      setLoading(false);
     };
 
     fetchUnavailableGowns();
@@ -40,7 +43,13 @@ export default function UnavailableGowns() {
 
       {/* List of Unavailable Gowns */}
       <div className="bg-white p-4 rounded-lg shadow-lg max-w-3xl mx-auto">
-        {unavailableGowns.length === 0 ? (
+        {loading ? ( // ✅ Show loading indicator
+          <p className="text-center text-gray-500">
+            <div className="flex justify-center">
+              <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+            </div>
+          </p>
+        ) : unavailableGowns.length === 0 ? (
           <p className="text-gray-500 text-center">No unavailable gowns.</p>
         ) : (
           <ul className="space-y-3">

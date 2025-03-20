@@ -7,9 +7,11 @@ import Modal from "@/components/Modal";
 export default function ForReturn() {
   const [rentals, setRentals] = useState([]);
   const [selectedRental, setSelectedRental] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchReturnedRentals = async () => {
+      setLoading(true);
       try {
         const response = await fetch("/api/rentals");
         if (response.ok) {
@@ -25,6 +27,7 @@ export default function ForReturn() {
       } catch (error) {
         console.error("Error fetching rentals:", error);
       }
+      setLoading(false);
     };
 
     fetchReturnedRentals();
@@ -86,7 +89,13 @@ export default function ForReturn() {
       </div>
 
       <div className="bg-white p-4 rounded-lg shadow-lg max-w-3xl mx-auto">
-        {rentals.length === 0 ? (
+        {loading ? ( // ✅ Show loading indicator
+          <p className="text-center text-gray-500">
+            <div className="flex justify-center">
+              <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+            </div>
+          </p>
+        ) : rentals.length === 0 ? (
           <p className="text-gray-500 text-center">No items for return.</p>
         ) : (
           <ul className="space-y-3">
