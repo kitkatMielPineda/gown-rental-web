@@ -16,8 +16,11 @@ export async function POST(req) {
       returnDate,
       gownDesc,
       forRepair,
+      repairDesc,
       downPayment,
       totalAmount,
+      securityDeposit,
+      notes,
       userId,
     } = body;
 
@@ -30,8 +33,11 @@ export async function POST(req) {
         returnDate: new Date(returnDate),
         gownDesc,
         forRepair,
+        repairDesc: repairDesc || null,
         downPayment: parseFloat(downPayment),
         totalAmount: parseFloat(totalAmount),
+        securityDeposit: securityDeposit || null,
+        notes: notes || null,
         user: { connect: { id: userId } },
       },
     });

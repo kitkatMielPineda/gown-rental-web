@@ -29,8 +29,11 @@ export async function PATCH(req, { params }) {
         returnDate: new Date(body.returnDate),
         gownDesc: body.gownDesc,
         forRepair: body.forRepair,
+        repairDesc: body.repairDesc || null,
         downPayment: parseFloat(body.downPayment),
         totalAmount: parseFloat(body.totalAmount),
+        securityDeposit: body.securityDeposit || null,
+        notes: body.notes || null,
       },
     });
 

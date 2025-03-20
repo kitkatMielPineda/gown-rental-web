@@ -27,8 +27,11 @@ model Rental {
   returnDate  DateTime
   gownDesc    String
   forRepair   Boolean  @default(false)
+  repairDesc  String? 
   downPayment Decimal
   totalAmount Decimal
+  securityDeposit String?
+  notes String?
   isPickedUp   Boolean @default(false)
   isReturned Boolean @default(false)
   createdAt   DateTime @default(now())

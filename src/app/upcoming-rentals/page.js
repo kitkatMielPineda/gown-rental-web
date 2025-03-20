@@ -46,8 +46,11 @@ export default function UpcomingRentals() {
           returnDate: updatedData.returnDate,
           gownDesc: updatedData.gownDesc,
           forRepair: updatedData.forRepair,
+          repairDesc: updatedData.repairDesc,
           downPayment: parseFloat(updatedData.downPayment),
           totalAmount: parseFloat(updatedData.totalAmount),
+          securityDeposit: updatedData.securityDeposit,
+          notes: updatedData.notes,
         }),
       });
 
@@ -135,13 +138,25 @@ export default function UpcomingRentals() {
                     {parseFloat(rental.totalAmount) -
                       parseFloat(rental.downPayment)}
                   </p>
+                  <p className="text-gray-600">
+                    <strong>Notes: </strong> {rental.notes}
+                  </p>
+                  <p className="text-gray-600">
+                    <strong>Security Deposit: </strong> {rental.securityDeposit}
+                  </p>
                 </div>
 
                 {/* Action Buttons */}
                 <div className="flex flex-col sm:flex-row gap-2 mt-3 sm:mt-0">
                   <button
                     className="bg-yellow-500 text-white px-3 py-2 rounded hover:bg-yellow-600 w-full sm:w-auto"
-                    onClick={() => setEditingRental(rental)}
+                    onClick={() =>
+                      setEditingRental({
+                        ...rental,
+                        securityDeposit: rental.securityDeposit || "",
+                        note: rental.note || "",
+                      })
+                    }
                   >
                     Edit
                   </button>
@@ -191,10 +206,20 @@ export default function UpcomingRentals() {
               {selectedRental.forRepair ? "Yes" : "No"}
             </p>
             <p>
+              <strong>Repair Description:</strong> {selectedRental.repairDesc}
+            </p>
+            <p>
               <strong>Down Payment:</strong> ₱{selectedRental.downPayment}
             </p>
             <p>
               <strong>Total Amount:</strong> ₱{selectedRental.totalAmount}
+            </p>
+            <p>
+              <strong>notes:</strong> {selectedRental.notes}
+            </p>
+            <p>
+              <strong>Security Deposit:</strong>{" "}
+              {selectedRental.securityDeposit}
             </p>
           </div>
         )}
@@ -289,6 +314,19 @@ export default function UpcomingRentals() {
                 }
               />
               <label htmlFor="forRepair">For Repair?</label>
+              <input
+                type="text"
+                name="repairDesc"
+                placeholder="repair description"
+                className="w-full p-2 border rounded"
+                value={editingRental.repairDesc || ""}
+                onChange={(e) =>
+                  setEditingRental({
+                    ...editingRental,
+                    repairDesc: e.target.value,
+                  })
+                }
+              />
             </div>
             <input
               type="number"
@@ -317,6 +355,32 @@ export default function UpcomingRentals() {
                 })
               }
               required
+            />
+            <input
+              type="text"
+              name="SecurityDeposit"
+              placeholder="Security Deposit"
+              className="w-full p-2 border rounded"
+              value={editingRental.securityDeposit || ""}
+              onChange={(e) =>
+                setEditingRental({
+                  ...editingRental,
+                  securityDeposit: e.target.value,
+                })
+              }
+            />
+            <input
+              type="text"
+              name="notes"
+              placeholder="Notes"
+              className="w-full p-2 border rounded"
+              value={editingRental.notes || ""}
+              onChange={(e) =>
+                setEditingRental({
+                  ...editingRental,
+                  notes: e.target.value,
+                })
+              }
             />
             <button
               type="submit"

@@ -20,8 +20,11 @@ export default function Home() {
     returnDate: "",
     gownDesc: "",
     forRepair: false,
+    repairDesc: "",
     downPayment: "",
     totalAmount: "",
+    note: "",
+    securityDeposit: "",
     user: { id: null },
   });
 
@@ -343,6 +346,15 @@ export default function Home() {
             />
             <label htmlFor="forRepair">For Repair?</label>
           </div>
+          {formData.forRepair && (
+            <textarea
+              name="repairDesc"
+              placeholder="Describe the repair needed..."
+              className="w-full p-2 border rounded mb-3"
+              value={formData.repairDesc}
+              onChange={handleChange}
+            />
+          )}
           <input
             type="number"
             name="downPayment"
@@ -360,6 +372,13 @@ export default function Home() {
             value={formData.totalAmount}
             onChange={handleChange}
             required
+          />
+          <textarea
+            name="note"
+            placeholder="Additional notes (optional)"
+            className="w-full p-2 border rounded mb-3"
+            value={formData.note}
+            onChange={handleChange}
           />
           <button
             type="submit"

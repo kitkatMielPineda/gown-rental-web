@@ -97,45 +97,68 @@ export default function ForReturn() {
           <p className="text-gray-500 text-center">No items for return.</p>
         ) : (
           <ul className="space-y-3">
-            {rentals.map((rental) => (
-              <li
-                key={rental.id}
-                className="border p-3 rounded bg-gray-50 shadow-md flex flex-col sm:flex-row justify-between items-start sm:items-center"
-              >
-                {/* Gown Details */}
-                <div className="flex-1 w-full sm:w-auto">
-                  <p className="text-lg font-semibold text-gray-800">
-                    <strong>Gown:</strong> {rental.gownDesc}
-                  </p>
-                  <p className="text-gray-600">
-                    <strong>Return Date:</strong>{" "}
-                    {new Date(rental.returnDate).toLocaleDateString()}
-                  </p>
-                  <p className="text-gray-600">
-                    <strong>Name:</strong> {rental.name}
-                  </p>
-                  <p className="text-gray-600">
-                    <strong>Contact:</strong> {rental.contact}
-                  </p>
-                </div>
+            {rentals.map((rental) => {
+              const today = new Date();
+              const returnDate = new Date(rental.returnDate);
+              const isOverdue = today > returnDate; // ✅ Check if overdue
 
-                {/* Action Buttons */}
-                <div className="flex flex-col sm:flex-row gap-2 mt-3 sm:mt-0">
-                  <button
-                    className="bg-blue-500 text-white px-3 py-2 rounded hover:bg-blue-600 w-full sm:w-auto"
-                    onClick={() => handleRevertPickup(rental.id)}
-                  >
-                    Back to Not Picked Up
-                  </button>
-                  <button
-                    className="bg-green-500 text-white px-3 py-2 rounded hover:bg-green-600 w-full sm:w-auto"
-                    onClick={() => handleMarkAsReturned(rental.id)}
-                  >
-                    Returned
-                  </button>
-                </div>
-              </li>
-            ))}
+              return (
+                <li
+                  key={rental.id}
+                  className="border p-3 rounded bg-gray-50 shadow-md flex flex-col sm:flex-row justify-between items-start sm:items-center"
+                >
+                  {/* Gown Details */}
+                  <div className="flex-1 w-full sm:w-auto">
+                    <p className="text-lg font-semibold text-gray-800">
+                      <strong>Gown:</strong> {rental.gownDesc}
+                    </p>
+                    <p className="text-gray-600">
+                      <strong>Return Date:</strong>{" "}
+                      {returnDate.toLocaleDateString()}
+                    </p>
+                    <p className="text-gray-600">
+                      <strong>Status:</strong>{" "}
+                      <span
+                        className={`font-semibold ${
+                          isOverdue ? "text-red-500" : "text-green-500"
+                        }`}
+                      >
+                        {isOverdue ? "Overdue" : "Good"}
+                      </span>
+                    </p>
+                    <p className="text-gray-600">
+                      <strong>Name:</strong> {rental.name}
+                    </p>
+                    <p className="text-gray-600">
+                      <strong>Contact:</strong> {rental.contact}
+                    </p>
+                    <p className="text-gray-600">
+                      <strong>Security Deposit:</strong>{" "}
+                      {rental.securityDeposit}
+                    </p>
+                    <p className="text-gray-600">
+                      <strong>Notes:</strong> {rental.notes}
+                    </p>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex flex-col sm:flex-row gap-2 mt-3 sm:mt-0">
+                    <button
+                      className="bg-blue-500 text-white px-3 py-2 rounded hover:bg-blue-600 w-full sm:w-auto"
+                      onClick={() => handleRevertPickup(rental.id)}
+                    >
+                      Back to Not Picked Up
+                    </button>
+                    <button
+                      className="bg-green-500 text-white px-3 py-2 rounded hover:bg-green-600 w-full sm:w-auto"
+                      onClick={() => handleMarkAsReturned(rental.id)}
+                    >
+                      Returned
+                    </button>
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         )}
       </div>
