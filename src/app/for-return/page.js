@@ -90,11 +90,9 @@ export default function ForReturn() {
 
       <div className="bg-white p-4 rounded-lg shadow-lg max-w-3xl mx-auto">
         {loading ? ( // ✅ Show loading indicator
-          <p className="text-center text-gray-500">
-            <div className="flex justify-center">
-              <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
-            </div>
-          </p>
+          <div className="flex justify-center">
+            <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+          </div>
         ) : rentals.length === 0 ? (
           <p className="text-gray-500 text-center">No items for return.</p>
         ) : (
