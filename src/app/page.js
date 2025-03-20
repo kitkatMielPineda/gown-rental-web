@@ -48,12 +48,11 @@ export default function Home() {
 
       try {
         const response = await fetch(
-          `/api/appointments?date=${appointmentForm.date}`
-        );
+          `/api/appointments/unavailable?date=${appointmentForm.date}`
+        ); // ✅ Correct endpoint
         if (response.ok) {
           const data = await response.json();
-          const takenTimes = data.map((appointment) => appointment.time);
-          setUnavailableTimes(takenTimes);
+          setUnavailableTimes(data);
         }
       } catch (error) {
         console.error("Error fetching unavailable times:", error);
@@ -61,7 +60,7 @@ export default function Home() {
     }
 
     fetchUnavailableTimes();
-  }, [appointmentForm.date]);
+  }, [appointmentForm.date]); // ✅ Runs when date changes
 
   // Handle form field changes
   const handleChange = (e) => {
@@ -193,18 +192,9 @@ export default function Home() {
       const formattedAppointments = appointments.map((appointment) => ({
         type: "Appointment",
         date: new Date(appointment.date),
+        time: appointment.time || "N/A", // ✅ Ensure `time` is included
         name: appointment.name || "No Name", // Ensure it exists
-        details: `Appointment: ${appointment.time}`, // Ensure updated time is shown
       }));
-      //   details: `Appointment: ${new Date(appointment.date).toLocaleTimeString(
-      //     "en-US",
-      //     {
-      //       hour: "2-digit",
-      //       minute: "2-digit",
-      //       hour12: true,
-      //     }
-      //   )}`,
-      // }));
 
       const combinedEvents = [...formattedRentals, ...formattedAppointments]
         .filter((event) => event.date >= today && event.date <= sevenDaysLater)
@@ -500,14 +490,7 @@ export default function Home() {
                     <br />
                     <span>Date: {event.date.toLocaleDateString()}</span>
                     <br />
-                    <span>
-                      Time:{" "}
-                      {event.date.toLocaleTimeString("en-US", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                        hour12: true,
-                      })}
-                    </span>
+                    <span>Time: {event.time}</span>
                   </>
                 )}
               </li>

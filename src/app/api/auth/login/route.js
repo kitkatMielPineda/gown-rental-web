@@ -1,4 +1,3 @@
-
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
@@ -13,8 +12,22 @@ export async function POST(req) {
     console.log("Login Request:", body);
     const { email, password } = body;
 
+    if (!email || !password) {
+      return NextResponse.json(
+        { error: "Email and password are required" },
+        { status: 400 }
+      );
+    }
+
+    // ✅ Debug Prisma Connection
+    const testConnection = await prisma.$queryRaw`SELECT 1`;
+    console.log("Prisma Connected:", testConnection);
+
     // Find user by email
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await prisma.user.findUnique({
+      where: { email: email.trim() || "" },
+    });
+    console.log("User found:", user);
     if (!user) {
       return NextResponse.json(
         { error: "Invalid credentials" },

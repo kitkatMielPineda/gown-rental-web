@@ -35,16 +35,18 @@ export default function UpcomingAppointments() {
 
   useEffect(() => {
     async function fetchUnavailableTimes() {
-      if (!editingAppointment || !editingAppointment.date) return; // Prevent errors
+      if (!editingAppointment || !editingAppointment.date) return;
 
       try {
         const response = await fetch(
-          `/api/appointments?date=${editingAppointment.date}`
+          `/api/appointments/unavailable?date=${editingAppointment.date}`
         );
+
         if (response.ok) {
           const data = await response.json();
-          const takenTimes = data.map((appointment) => appointment.time);
-          setUnavailableTimes(takenTimes);
+          setUnavailableTimes(data);
+        } else {
+          console.error("Failed to fetch unavailable times");
         }
       } catch (error) {
         console.error("Error fetching unavailable times:", error);
@@ -52,7 +54,7 @@ export default function UpcomingAppointments() {
     }
 
     fetchUnavailableTimes();
-  }, [editingAppointment?.date]); // ✅ Now updates when date changes
+  }, [editingAppointment?.date]);
 
   const handleUpdateAppointment = async (id, updatedData) => {
     try {
@@ -137,7 +139,13 @@ export default function UpcomingAppointments() {
                   <div className="flex flex-col sm:flex-row gap-2 mt-3 sm:mt-0">
                     <button
                       className="bg-yellow-500 text-white px-3 py-2 rounded hover:bg-yellow-600 w-full sm:w-auto"
-                      onClick={() => setEditingAppointment(appointment)}
+                      onClick={() =>
+                        setEditingAppointment({
+                          ...appointment,
+                          date: "", // Empty date
+                          time: "", // Empty time
+                        })
+                      }
                     >
                       Edit
                     </button>
