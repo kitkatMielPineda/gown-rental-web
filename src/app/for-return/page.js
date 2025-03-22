@@ -8,6 +8,7 @@ export default function ForReturn() {
   const [rentals, setRentals] = useState([]);
   const [selectedRental, setSelectedRental] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState(false);
 
   useEffect(() => {
     const fetchReturnedRentals = async () => {
@@ -34,34 +35,76 @@ export default function ForReturn() {
   }, []);
 
   // ✅ Mark as Returned (Permanently Remove from List)
+  // const handleMarkAsReturned = async (id) => {
+  //   if (!window.confirm("Are you sure this item has been returned?")) return;
+
+  //   try {
+  //     const response = await fetch(`/api/rentals/${id}/return`, {
+  //       method: "PATCH",
+  //     });
+
+  //     if (response.ok) {
+  //       setForReturnItems(forReturnItems.filter((rental) => rental.id !== id));
+  //     } else {
+  //       console.error("Failed to update return status");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error updating return status:", error);
+  //   }
+  // };
   const handleMarkAsReturned = async (id) => {
     if (!window.confirm("Are you sure this item has been returned?")) return;
 
+    setActionLoading(true);
     try {
       const response = await fetch(`/api/rentals/${id}/return`, {
         method: "PATCH",
       });
 
       if (response.ok) {
-        setForReturnItems(forReturnItems.filter((rental) => rental.id !== id));
+        setRentals((prevRentals) =>
+          prevRentals.filter((rental) => rental.id !== id)
+        );
       } else {
         console.error("Failed to update return status");
       }
     } catch (error) {
       console.error("Error updating return status:", error);
+    } finally {
+      setActionLoading(false);
     }
   };
 
-  const handleRevertPickup = async (id) => {
-    if (!confirm("Are you sure you want to revert this rental?")) return;
+  // const handleRevertPickup = async (id) => {
+  //   if (!confirm("Are you sure you want to revert this rental?")) return;
 
+  //   try {
+  //     const response = await fetch(`/api/rentals/${id}/revert-pickup`, {
+  //       method: "PATCH",
+  //     });
+
+  //     if (response.ok) {
+  //       // ✅ Remove from For Return list & refresh UI
+  //       setRentals((prevRentals) =>
+  //         prevRentals.filter((rental) => rental.id !== id)
+  //       );
+  //     } else {
+  //       console.error("Failed to revert rental pickup status");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error reverting rental pickup status:", error);
+  //   }
+  // };
+  const handleRevertPickup = async (id) => {
+    if (!window.confirm("Are you sure you want to revert this rental?")) return;
+
+    setActionLoading(true);
     try {
       const response = await fetch(`/api/rentals/${id}/revert-pickup`, {
         method: "PATCH",
       });
 
       if (response.ok) {
-        // ✅ Remove from For Return list & refresh UI
         setRentals((prevRentals) =>
           prevRentals.filter((rental) => rental.id !== id)
         );
@@ -70,6 +113,8 @@ export default function ForReturn() {
       }
     } catch (error) {
       console.error("Error reverting rental pickup status:", error);
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -146,14 +191,16 @@ export default function ForReturn() {
                     <button
                       className="bg-blue-500 text-white px-3 py-2 rounded hover:bg-blue-600 w-full sm:w-auto"
                       onClick={() => handleRevertPickup(rental.id)}
+                      disabled={actionLoading}
                     >
-                      Back to Not Picked Up
+                      {actionLoading ? "Reverting..." : "Back to Not Picked Up"}
                     </button>
                     <button
                       className="bg-green-500 text-white px-3 py-2 rounded hover:bg-green-600 w-full sm:w-auto"
                       onClick={() => handleMarkAsReturned(rental.id)}
+                      disabled={actionLoading}
                     >
-                      Returned
+                      {actionLoading ? "Saving..." : "Returned"}
                     </button>
                   </div>
                 </li>
