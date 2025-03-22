@@ -3,33 +3,33 @@ import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import Link from "next/link";
 import Modal from "@/components/Modal";
+import AddAppointmentForm from "@/components/AddAppointmentForm";
 
 export default function UpcomingAppointments() {
   const [appointments, setAppointments] = useState([]);
   const [editingAppointment, setEditingAppointment] = useState(null);
   const [unavailableTimes, setUnavailableTimes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isAppointmentModalOpen, setIsAppointmentModalOpen] = useState(false);
+
+  const fetchAppointments = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("/api/appointments");
+      const data = await response.json();
+
+      if (response.ok) {
+        setAppointments(data);
+      } else {
+        console.error("Failed to fetch appointments:", data.error);
+      }
+    } catch (error) {
+      console.error("Error fetching appointments:", error);
+    }
+    setLoading(false);
+  };
 
   useEffect(() => {
-    const fetchAppointments = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch("/api/appointments");
-        const data = await response.json();
-
-        console.log("Fetched Appointments:", data); // ✅ Debugging: Log the fetched data
-
-        if (response.ok) {
-          setAppointments(data);
-        } else {
-          console.error("Failed to fetch appointments:", data.error);
-        }
-      } catch (error) {
-        console.error("Error fetching appointments:", error);
-      }
-      setLoading(false);
-    };
-
     fetchAppointments();
   }, []);
 
@@ -88,7 +88,6 @@ export default function UpcomingAppointments() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-4 sm:p-6">
-      <Navbar />
       <div className="container mx-auto p-6">
         {/* Title */}
         <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-center">
@@ -100,6 +99,16 @@ export default function UpcomingAppointments() {
           <Link href="/" className="text-blue-500 hover:underline">
             ← Back to Home
           </Link>
+        </div>
+
+        {/* Add Appointment Button */}
+        <div className="flex justify-center mb-4">
+          <button
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            onClick={() => setIsAppointmentModalOpen(true)}
+          >
+            Add New Appointment
+          </button>
         </div>
 
         {/* List of Upcoming Appointments */}
@@ -156,6 +165,20 @@ export default function UpcomingAppointments() {
           )}
         </div>
       </div>
+
+      {/* Add Appointment Button */}
+      <Modal
+        isOpen={isAppointmentModalOpen}
+        onClose={() => setIsAppointmentModalOpen(false)}
+        title="Add New Appointment"
+      >
+        <AddAppointmentForm
+          onAppointmentAdded={() => {
+            setIsAppointmentModalOpen(false);
+            fetchAppointments(); // 🔁 Refresh list
+          }}
+        />
+      </Modal>
       {/* ✅ Edit Appointment Modal */}
       <Modal
         isOpen={editingAppointment !== null}

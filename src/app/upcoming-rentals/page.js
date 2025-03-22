@@ -3,34 +3,33 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Modal from "@/components/Modal";
+import AddRentalForm from "@/components/AddRentalForm";
 
 export default function UpcomingRentals() {
   const [rentals, setRentals] = useState([]);
   const [selectedRental, setSelectedRental] = useState(null);
   const [editingRental, setEditingRental] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isRentalModalOpen, setIsRentalModalOpen] = useState(false);
+
+  const fetchRentals = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("/api/rentals");
+      if (response.ok) {
+        const data = await response.json();
+        const filteredRentals = data.filter((rental) => !rental.isPickedUp);
+        setRentals(filteredRentals);
+      } else {
+        console.error("Failed to fetch rentals", response.json());
+      }
+    } catch (error) {
+      console.error("Error fetching rentals:", error);
+    }
+    setLoading(false);
+  };
 
   useEffect(() => {
-    async function fetchRentals() {
-      setLoading(true); // ✅ Show loading before fetch
-      try {
-        const response = await fetch("/api/rentals");
-        if (response.ok) {
-          const data = await response.json();
-
-          // ✅ Filter rentals to show only ones that are NOT picked up
-          const filteredRentals = data.filter((rental) => !rental.isPickedUp);
-
-          setRentals(filteredRentals);
-        } else {
-          console.error("Failed to fetch rentals", response.json());
-        }
-      } catch (error) {
-        console.error("Error fetching rentals:", error);
-      }
-      setLoading(false); // ✅ Hide loading after fetch
-    }
-
     fetchRentals();
   }, []);
 
@@ -98,6 +97,16 @@ export default function UpcomingRentals() {
         <Link href="/" className="text-blue-500 hover:underline">
           ← Back to Home
         </Link>
+      </div>
+
+      {/* Add Rental Button */}
+      <div className="flex justify-center mb-4">
+        <button
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          onClick={() => setIsRentalModalOpen(true)}
+        >
+          Add New Upcoming Rental
+        </button>
       </div>
 
       {/* Rentals List */}
@@ -175,6 +184,14 @@ export default function UpcomingRentals() {
           </ul>
         )}
       </div>
+
+      <Modal
+        isOpen={isRentalModalOpen}
+        onClose={() => setIsRentalModalOpen(false)}
+        title="Add New Rental"
+      >
+        <AddRentalForm onRentalAdded={fetchRentals} />
+      </Modal>
 
       {/* ✅ Rental Details Modal */}
       <Modal
