@@ -29,6 +29,9 @@ model Rental {
   forRepair   Boolean  @default(false)
   repairDesc  String? 
   downPayment Decimal
+  downPaymentMode  PaymentMode? // Radio
+  finalPayment     Decimal?
+  finalPaymentMode PaymentMode? // Radio
   totalAmount Decimal
   securityDeposit String?
   notes String?
@@ -49,4 +52,23 @@ model Appointment {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([date, time])
+}
+
+model Expense {
+  id          String   @id @default(uuid())
+  amount      Decimal
+  paymentMode PaymentMode?
+  description String
+  createdAt   DateTime @default(now())
+}
+
+enum PaymentMode {
+  GCASH
+  Maya
+  GoTyme
+  BPI
+  BDO
+  UnionBank
+  Metrobank
+  Cash
 }

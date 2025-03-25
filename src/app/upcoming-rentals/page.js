@@ -11,6 +11,9 @@ export default function UpcomingRentals() {
   const [editingRental, setEditingRental] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isRentalModalOpen, setIsRentalModalOpen] = useState(false);
+  const [pickupRental, setPickupRental] = useState(null);
+  const [isFinalPaymentModalOpen, setIsFinalPaymentModalOpen] = useState(false);
+  const [finalPaymentRental, setFinalPaymentRental] = useState(null);
 
   const fetchRentals = async () => {
     setLoading(true);
@@ -47,6 +50,7 @@ export default function UpcomingRentals() {
           forRepair: updatedData.forRepair,
           repairDesc: updatedData.repairDesc,
           downPayment: parseFloat(updatedData.downPayment),
+          downPaymentMode: updatedData.downPaymentMode,
           totalAmount: parseFloat(updatedData.totalAmount),
           securityDeposit: updatedData.securityDeposit,
           notes: updatedData.notes,
@@ -171,12 +175,17 @@ export default function UpcomingRentals() {
                   </button>
                   <button
                     className="bg-green-500 text-white px-3 py-2 rounded hover:bg-green-600 w-full sm:w-auto"
+                    // onClick={(e) => {
+                    //   e.stopPropagation(); // Prevent modal from opening
+                    //   handleMarkAsPickedUp(rental.id);
+                    // }}
                     onClick={(e) => {
-                      e.stopPropagation(); // Prevent modal from opening
-                      handleMarkAsPickedUp(rental.id);
+                      e.stopPropagation();
+                      setFinalPaymentRental(rental);
+                      setIsFinalPaymentModalOpen(true);
                     }}
                   >
-                    Done
+                    Picked-up / Delivered
                   </button>
                 </div>
               </li>
@@ -229,14 +238,14 @@ export default function UpcomingRentals() {
               <strong>Down Payment:</strong> ₱{selectedRental.downPayment}
             </p>
             <p>
+              <strong>Down Payment Mode:</strong>{" "}
+              {selectedRental.downPaymentMode}
+            </p>
+            <p>
               <strong>Total Amount:</strong> ₱{selectedRental.totalAmount}
             </p>
             <p>
               <strong>notes:</strong> {selectedRental.notes}
-            </p>
-            <p>
-              <strong>Security Deposit:</strong>{" "}
-              {selectedRental.securityDeposit}
             </p>
           </div>
         )}
@@ -267,7 +276,7 @@ export default function UpcomingRentals() {
             />
             <input
               type="date"
-              value={editingRental.pickupDate}
+              value={editingRental.pickupDate?.slice(0, 10) || ""}
               onChange={(e) =>
                 setEditingRental({
                   ...editingRental,
@@ -279,7 +288,7 @@ export default function UpcomingRentals() {
             />
             <input
               type="date"
-              value={editingRental.returnDate}
+              value={editingRental.returnDate?.slice(0, 10) || ""}
               onChange={(e) =>
                 setEditingRental({
                   ...editingRental,
@@ -359,6 +368,38 @@ export default function UpcomingRentals() {
               }
               required
             />
+            <label className="block font-semibold">
+              Mode of Payment for Down Payment
+            </label>
+            <div className="flex flex-wrap gap-2 mb-2">
+              {[
+                "GCASH",
+                "Maya",
+                "GoTyme",
+                "BPI",
+                "BDO",
+                "UnionBank",
+                "Metrobank",
+                "Cash",
+              ].map((mode) => (
+                <label key={mode} className="flex items-center gap-1">
+                  <input
+                    type="radio"
+                    name="downPaymentMode"
+                    value={mode}
+                    checked={editingRental.downPaymentMode === mode}
+                    onChange={(e) =>
+                      setEditingRental({
+                        ...editingRental,
+                        downPaymentMode: e.target.value,
+                      })
+                    }
+                    required
+                  />
+                  {mode}
+                </label>
+              ))}
+            </div>
             <input
               type="number"
               name="totalAmount"
@@ -372,19 +413,6 @@ export default function UpcomingRentals() {
                 })
               }
               required
-            />
-            <input
-              type="text"
-              name="SecurityDeposit"
-              placeholder="Security Deposit"
-              className="w-full p-2 border rounded"
-              value={editingRental.securityDeposit || ""}
-              onChange={(e) =>
-                setEditingRental({
-                  ...editingRental,
-                  securityDeposit: e.target.value,
-                })
-              }
             />
             <input
               type="text"
@@ -408,6 +436,96 @@ export default function UpcomingRentals() {
           </form>
         )}
       </Modal>
+
+      {isFinalPaymentModalOpen && finalPaymentRental && (
+        <Modal
+          isOpen={isFinalPaymentModalOpen}
+          onClose={() => {
+            setIsFinalPaymentModalOpen(false);
+            setFinalPaymentRental(null);
+          }}
+          title="Finalize Payment"
+        >
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+
+              const formData = new FormData(e.target);
+              const finalPayment = formData.get("finalPayment");
+              const finalPaymentMode = formData.get("finalPaymentMode");
+              const securityDeposit = formData.get("securityDeposit");
+
+              const response = await fetch(
+                `/api/rentals/${finalPaymentRental.id}`,
+                {
+                  method: "PATCH",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    finalPayment: parseFloat(finalPayment),
+                    finalPaymentMode,
+                    securityDeposit,
+                    isPickedUp: true,
+                  }),
+                }
+              );
+
+              if (response.ok) {
+                fetchRentals();
+                setIsFinalPaymentModalOpen(false);
+                setFinalPaymentRental(null);
+              } else {
+                alert("Failed to update rental");
+              }
+            }}
+          >
+            <input
+              type="number"
+              name="finalPayment"
+              placeholder="Final Payment"
+              required
+              className="w-full p-2 border rounded mb-2"
+            />
+
+            <label className="block font-semibold">Mode of Payment</label>
+            <div className="flex flex-wrap gap-2 mb-2">
+              {[
+                "GCASH",
+                "Maya",
+                "GoTyme",
+                "BPI",
+                "BDO",
+                "UnionBank",
+                "Metrobank",
+                "Cash",
+              ].map((mode) => (
+                <label key={mode} className="flex items-center gap-1">
+                  <input
+                    type="radio"
+                    name="finalPaymentMode"
+                    value={mode}
+                    required
+                  />
+                  {mode}
+                </label>
+              ))}
+            </div>
+
+            <input
+              type="text"
+              name="securityDeposit"
+              placeholder="Security Deposit (optional)"
+              className="w-full p-2 border rounded mb-4"
+            />
+
+            <button
+              type="submit"
+              className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700"
+            >
+              Confirm Picked-up / Delivered
+            </button>
+          </form>
+        </Modal>
+      )}
     </div>
   );
 }

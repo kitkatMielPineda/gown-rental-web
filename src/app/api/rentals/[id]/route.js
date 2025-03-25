@@ -8,18 +8,32 @@ export async function PATCH(req, { params }) {
 
     console.log("Updating rental with ID:", id, "Data:", body); // ✅ Debugging
 
-    // ✅ Check if the request is marking the rental as picked up
+    // ✅ Case 1: Mark as Picked-Up with final payment
     if (body.isPickedUp !== undefined) {
+      const updateData = {
+        isPickedUp: body.isPickedUp,
+      };
+
+      // Include optional final payment info if available
+      if (body.finalPayment !== undefined) {
+        updateData.finalPayment = parseFloat(body.finalPayment);
+      }
+      if (body.finalPaymentMode) {
+        updateData.finalPaymentMode = body.finalPaymentMode;
+      }
+      if (body.securityDeposit) {
+        updateData.securityDeposit = body.securityDeposit;
+      }
+
       const updatedRental = await prisma.rental.update({
         where: { id },
-        data: { isPickedUp: body.isPickedUp },
+        data: updateData,
       });
 
-      console.log("Updated Rental:", updatedRental); // ✅ Debugging
       return NextResponse.json(updatedRental, { status: 200 });
     }
 
-    // ✅ Otherwise, update rental details
+    // ✅ Case 2: Regular rental edit
     const updatedRental = await prisma.rental.update({
       where: { id },
       data: {
@@ -31,13 +45,13 @@ export async function PATCH(req, { params }) {
         forRepair: body.forRepair,
         repairDesc: body.repairDesc || null,
         downPayment: parseFloat(body.downPayment),
+        downPaymentMode: body.downPaymentMode || null,
         totalAmount: parseFloat(body.totalAmount),
         securityDeposit: body.securityDeposit || null,
         notes: body.notes || null,
       },
     });
 
-    console.log("Updated Rental:", updatedRental); // ✅ Debugging
     return NextResponse.json(updatedRental, { status: 200 });
   } catch (error) {
     console.error("Error updating rental status:", error);

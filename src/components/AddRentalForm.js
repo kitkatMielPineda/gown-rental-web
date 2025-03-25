@@ -12,10 +12,21 @@ export default function AddRentalForm({ onRentalAdded }) {
     forRepair: false,
     repairDesc: "",
     downPayment: "",
+    downPaymentMode: "",
     totalAmount: "",
     securityDeposit: "",
     note: "",
   });
+  const downPaymentMode = [
+    "GCASH",
+    "Maya",
+    "GoTyme",
+    "BPI",
+    "BDO",
+    "UnionBank",
+    "Metrobank",
+    "Cash",
+  ];
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -24,6 +35,8 @@ export default function AddRentalForm({ onRentalAdded }) {
       [name]: type === "checkbox" ? checked : value,
     }));
   };
+
+  console.log("Submitting rental:", formData);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -118,6 +131,23 @@ export default function AddRentalForm({ onRentalAdded }) {
         value={formData.downPayment}
         onChange={handleChange}
       />
+      <div>
+        <label className="block font-semibold mb-2">Mode of Down Payment</label>
+        <div className="grid grid-cols-2 gap-2">
+          {downPaymentMode.map((mode) => (
+            <label key={mode} className="flex items-center gap-2">
+              <input
+                type="radio"
+                name="downPaymentMode"
+                value={mode}
+                checked={formData.downPaymentMode === mode}
+                onChange={handleChange}
+              />
+              {mode}
+            </label>
+          ))}
+        </div>
+      </div>
       <input
         className="w-full p-2 border rounded"
         name="totalAmount"

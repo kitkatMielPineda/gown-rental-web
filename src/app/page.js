@@ -257,6 +257,18 @@ export default function Home() {
           >
             Unavailable Gowns
           </button>
+          <button
+            className="bg-blue-500 text-white py-3 px-4 rounded-lg shadow hover:bg-blue-600"
+            onClick={() => (window.location.href = "/earnings-and-expenses")}
+          >
+            Earnings/expenses
+          </button>
+          <button
+            className="bg-red-500 text-white py-3 px-4 rounded-lg shadow hover:bg-blue-600"
+            onClick={() => (window.location.href = "/expenses")}
+          >
+            Expenses
+          </button>
         </div>
       </div>
       {/* Schedule Type Selection Modal */}
