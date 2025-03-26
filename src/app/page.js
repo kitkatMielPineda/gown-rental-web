@@ -339,8 +339,7 @@ export default function Home() {
             onChange={handleChange}
             required
           />
-          <input
-            type="text"
+          <textarea
             name="gownDesc"
             placeholder="Gown Description"
             className="w-full p-2 border rounded"

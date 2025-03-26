@@ -98,7 +98,7 @@ export default function AddRentalForm({ onRentalAdded }) {
         value={formData.returnDate}
         onChange={handleChange}
       />
-      <input
+      <textarea
         className="w-full p-2 border rounded"
         name="gownDesc"
         placeholder="Gown Description"
@@ -164,7 +164,7 @@ export default function AddRentalForm({ onRentalAdded }) {
         value={formData.securityDeposit}
         onChange={handleChange}
       />
-      <input
+      <textarea
         className="w-full p-2 border rounded"
         name="note"
         placeholder="Notes (optional)"

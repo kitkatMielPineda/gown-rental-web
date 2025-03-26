@@ -312,8 +312,7 @@ export default function UpcomingRentals() {
               }
               required
             />
-            <input
-              type="text"
+            <textarea
               name="gownDesc"
               placeholder="Gown Description"
               className="w-full p-2 border rounded"
@@ -414,7 +413,7 @@ export default function UpcomingRentals() {
               }
               required
             />
-            <input
+            <textarea
               type="text"
               name="notes"
               placeholder="Notes"
