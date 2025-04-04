@@ -56,48 +56,63 @@ export default function EarningsAndExpensesPage() {
             (a, b) =>
               new Date(a.monthKey + "-01") - new Date(b.monthKey + "-01")
           )
-          .map(({ monthLabel, breakdown, totalEarnings }) => (
-            <div key={monthLabel} className="mb-10">
-              <h3 className="text-xl font-semibold mb-2">{monthLabel}</h3>
-              <div className="overflow-x-auto">
-                <table className="min-w-full bg-white shadow-md rounded">
-                  <thead className="bg-gray-200">
-                    <tr>
-                      <th className="py-2 px-4 border">Bank</th>
-                      <th className="py-2 px-4 border">Earnings</th>
-                      <th className="py-2 px-4 border">Expenses</th>
-                      <th className="py-2 px-4 border">Total</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {paymentModes.map((mode) => {
-                      const { earnings = 0, expenses = 0 } =
-                        breakdown[mode] || {};
-                      const net = earnings - expenses;
+          .map(({ monthLabel, breakdown, totalEarnings }) => {
+            const totalExpenses = paymentModes.reduce((acc, mode) => {
+              return acc + (breakdown[mode]?.expenses || 0);
+            }, 0);
+            const netIncome = totalEarnings - totalExpenses;
 
-                      return (
-                        <tr key={mode}>
-                          <td className="py-2 px-4 border">{mode}</td>
-                          <td className="py-2 px-4 border">
-                            ₱{earnings.toLocaleString()}
-                          </td>
-                          <td className="py-2 px-4 border">
-                            ₱{expenses.toLocaleString()}
-                          </td>
-                          <td className="py-2 px-4 border">
-                            ₱{net.toLocaleString()}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+            return (
+              <div key={monthLabel} className="mb-10">
+                <h3 className="text-xl font-semibold mb-2">{monthLabel}</h3>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full bg-white shadow-md rounded">
+                    <thead className="bg-gray-200">
+                      <tr>
+                        <th className="py-2 px-4 border">Bank</th>
+                        <th className="py-2 px-4 border">Earnings</th>
+                        <th className="py-2 px-4 border">Expenses</th>
+                        <th className="py-2 px-4 border">Total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {paymentModes.map((mode) => {
+                        const { earnings = 0, expenses = 0 } =
+                          breakdown[mode] || {};
+                        const net = earnings - expenses;
+
+                        return (
+                          <tr key={mode}>
+                            <td className="py-2 px-4 border">{mode}</td>
+                            <td className="py-2 px-4 border">
+                              ₱{earnings.toLocaleString()}
+                            </td>
+                            <td className="py-2 px-4 border">
+                              ₱{expenses.toLocaleString()}
+                            </td>
+                            <td className="py-2 px-4 border">
+                              ₱{net.toLocaleString()}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+                <div className="mt-2 text-right font-semibold space-y-1">
+                  <p>Total Earnings: ₱{totalEarnings.toLocaleString()}</p>
+                  <p>Total Expenses: ₱{totalExpenses.toLocaleString()}</p>
+                  <p
+                    className={
+                      netIncome < 0 ? "text-red-600" : "text-green-700"
+                    }
+                  >
+                    Net Income: ₱{netIncome.toLocaleString()}
+                  </p>
+                </div>
               </div>
-              <p className="mt-2 text-right font-semibold">
-                Total Earnings: ₱{totalEarnings.toLocaleString()}
-              </p>
-            </div>
-          ))
+            );
+          })
       )}
     </div>
   );
