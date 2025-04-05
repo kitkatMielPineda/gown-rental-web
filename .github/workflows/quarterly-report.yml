@@ -11,5 +11,5 @@ jobs:
     steps:
       - name: Call Supabase Edge Function
         run: |
-          curl -X POST "https://rsqbegudzpexahrmtzqb.supabase.co/functions/v1/archive-quarterly-data" \
+          curl -i -X POST "https://rsqbegudzpexahrmtzqb.supabase.co/functions/v1/archive-quarterly-data" \
             -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}"
