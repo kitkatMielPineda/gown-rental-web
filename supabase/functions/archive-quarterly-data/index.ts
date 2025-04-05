@@ -297,12 +297,16 @@ serve(async (_req) => {
 
     const from = dayjs(`${year}-${String(startMonth).padStart(2, "0")}-01`)
       .startOf("day")
-      .toISOString(); // 2025-01-01T00:00:00.000Z
+      .format("YYYY-MM-DD HH:mm:ss");
 
     const to = dayjs(`${year}-${String(endMonth).padStart(2, "0")}-01`)
       .endOf("month")
       .endOf("day")
-      .toISOString(); // 2025-03-31T23:59:59.999Z
+      .format("YYYY-MM-DD HH:mm:ss");
+
+    const subjectDateLabel = `${dayjs(from).format("MMMM D, YYYY")} to ${dayjs(
+      to
+    ).format("MMMM D, YYYY")}`;
 
     // 2. Fetch Rental and Expense Data
     const { data: rentals, error: rentalError } = await supabase
@@ -409,7 +413,7 @@ serve(async (_req) => {
     await resend.emails.send({
       from: "Keith's Gown Rental <onboarding@resend.dev>",
       to: "kitkat.miel.pineda@gmail.com",
-      subject: `Quarterly Report - ${from} to ${to}`,
+      subject: `Quarterly Report - ${subjectDateLabel}`,
       html: "<p>Attached are the quarterly rental, expenses, and summary reports.</p>",
       attachments: [
         {
