@@ -295,18 +295,17 @@ serve(async (_req) => {
       return new Response("Not a scheduled archive month", { status: 400 });
     }
 
-    const from = dayjs(`${year}-${String(startMonth).padStart(2, "0")}-01`)
-      .startOf("day")
-      .format("YYYY-MM-DD HH:mm:ss");
-
-    const to = dayjs(`${year}-${String(endMonth).padStart(2, "0")}-01`)
+    const rawFrom = dayjs(`${year}-${String(startMonth).padStart(2, "0")}-01`);
+    const rawTo = dayjs(`${year}-${String(endMonth).padStart(2, "0")}-01`)
       .endOf("month")
-      .endOf("day")
-      .format("YYYY-MM-DD HH:mm:ss");
+      .endOf("day");
 
-    const subjectDateLabel = `${dayjs(from).format("MMMM D, YYYY")} to ${dayjs(
-      to
-    ).format("MMMM D, YYYY")}`;
+    const from = rawFrom.format("YYYY-MM-DD HH:mm:ss");
+    const to = rawTo.format("YYYY-MM-DD HH:mm:ss");
+
+    const subjectDateLabel = `${rawFrom.format(
+      "MMMM D, YYYY"
+    )} to ${rawTo.format("MMMM D, YYYY")}`;
 
     // 2. Fetch Rental and Expense Data
     const { data: rentals, error: rentalError } = await supabase
@@ -439,13 +438,13 @@ serve(async (_req) => {
     await supabase
       .from("Rental")
       .delete()
-      .gte("pickupDate", from)
-      .lte("pickupDate", to);
+      .gte("pickupDate", new Date(from))
+      .lte("pickupDate", new Date(to));
     await supabase
       .from("Expense")
       .delete()
-      .gte("createdAt", from)
-      .lte("createdAt", to);
+      .gte("pickupDate", new Date(from))
+      .lte("pickupDate", new Date(to));
 
     return new Response("✅ Email sent and data deleted!", { status: 200 });
   } catch (err) {
