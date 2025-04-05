@@ -295,13 +295,16 @@ serve(async (_req) => {
       return new Response("Not a scheduled archive month", { status: 400 });
     }
 
-    const rawFrom = dayjs(`${year}-${String(startMonth).padStart(2, "0")}-01`);
-    const rawTo = dayjs(`${year}-${String(endMonth).padStart(2, "0")}-01`)
+    const rawFrom = dayjs.utc(
+      `${year}-${String(startMonth).padStart(2, "0")}-01`
+    );
+    const rawTo = dayjs
+      .utc(`${year}-${String(endMonth).padStart(2, "0")}-01`)
       .endOf("month")
       .endOf("day");
 
-    const from = rawFrom.format("YYYY-MM-DD HH:mm:ss");
-    const to = rawTo.format("YYYY-MM-DD HH:mm:ss");
+    const from = rawFrom.toISOString(); // "2025-01-01T00:00:00.000Z"
+    const to = rawTo.toISOString(); // "2025-03-31T23:59:59.999Z"
 
     const subjectDateLabel = `${rawFrom.format(
       "MMMM D, YYYY"
@@ -437,15 +440,15 @@ serve(async (_req) => {
     // 7. Delete previous quarter data
     const { count: rentalCount } = await supabase
       .from("Rental")
-      .select("*", { count: "exact", head: true })
-      .gte("pickupDate", new Date(from))
-      .lte("pickupDate", new Date(to));
+      .delete()
+      .gte("pickupDate", from)
+      .lte("pickupDate", to);
 
     const { count: expenseCount } = await supabase
       .from("Expense")
-      .select("*", { count: "exact", head: true })
-      .gte("createdAt", new Date(from))
-      .lte("createdAt", new Date(to));
+      .delete()
+      .gte("createdAt", from)
+      .lte("createdAt", to);
 
     console.log(
       `🧹 Deleting ${rentalCount} rentals and ${expenseCount} expenses...`
