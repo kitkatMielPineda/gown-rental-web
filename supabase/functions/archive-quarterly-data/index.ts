@@ -265,7 +265,7 @@ import dayjs from "https://esm.sh/dayjs@1.11.10";
 import utc from "https://esm.sh/dayjs@1.11.10/plugin/utc.js";
 import { Resend } from "https://esm.sh/resend";
 
-// 👇 enable UTC plugin
+// Enable UTC plugin
 dayjs.extend(utc);
 
 serve(async (_req) => {
@@ -273,8 +273,9 @@ serve(async (_req) => {
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
   );
+
   try {
-    // 1. Identify the correct quarterly range
+    // Determine current quarter
     const now = new Date();
     let year = now.getFullYear();
     const month = now.getMonth() + 1;
@@ -299,6 +300,7 @@ serve(async (_req) => {
       return new Response("Not a scheduled archive month", { status: 400 });
     }
 
+    // Format time using Supabase-friendly format
     const rawFrom = dayjs.utc(
       `${year}-${String(startMonth).padStart(2, "0")}-01`
     );
@@ -307,21 +309,23 @@ serve(async (_req) => {
       .endOf("month")
       .endOf("day");
 
-    const from = rawFrom.toISOString(); // "2025-01-01T00:00:00.000Z"
-    const to = rawTo.toISOString(); // "2025-03-31T23:59:59.999Z"
-
+    const from = rawFrom.format("YYYY-MM-DD HH:mm:ss");
+    const to = rawTo.format("YYYY-MM-DD HH:mm:ss");
     const subjectDateLabel = `${rawFrom.format(
       "MMMM D, YYYY"
     )} to ${rawTo.format("MMMM D, YYYY")}`;
 
-    // 2. Fetch Rental and Expense Data
+    console.log("🗓️ Filtering From:", from);
+    console.log("🗓️ Filtering To:", to);
+
+    // Fetch rental and expense data
     const { data: rentals, error: rentalError } = await supabase
       .from("Rental")
       .select("*")
       .gte("pickupDate", from)
       .lte("pickupDate", to);
 
-    if (rentalError) throw new Error("Failed to fetch rentals");
+    if (rentalError) throw rentalError;
 
     const { data: expenses, error: expenseError } = await supabase
       .from("Expense")
@@ -329,9 +333,12 @@ serve(async (_req) => {
       .gte("createdAt", from)
       .lte("createdAt", to);
 
-    if (expenseError) throw new Error("Failed to fetch expenses");
+    if (expenseError) throw expenseError;
 
-    // 3. Generate Summary
+    console.log(`📦 Rentals fetched: ${rentals.length}`);
+    console.log(`📦 Expenses fetched: ${expenses.length}`);
+
+    // Generate earnings/expenses summary
     const paymentModes = [
       "GCASH",
       "Maya",
@@ -342,7 +349,6 @@ serve(async (_req) => {
       "Metrobank",
       "Cash",
     ];
-
     const summary = [];
     const monthMap: Record<string, any> = {};
 
@@ -358,13 +364,11 @@ serve(async (_req) => {
           ),
         };
       }
-
       if (r.downPaymentMode) {
         const amt = Number(r.downPayment || 0);
         monthMap[key].breakdown[r.downPaymentMode].earnings += amt;
         monthMap[key].totalEarnings += amt;
       }
-
       if (r.finalPaymentMode) {
         const amt = Number(r.finalPayment || 0);
         monthMap[key].breakdown[r.finalPaymentMode].earnings += amt;
@@ -384,7 +388,6 @@ serve(async (_req) => {
           ),
         };
       }
-
       if (e.paymentMode) {
         const amt = Number(e.amount || 0);
         monthMap[key].breakdown[e.paymentMode].expenses += amt;
@@ -394,7 +397,7 @@ serve(async (_req) => {
 
     summary.push(...Object.values(monthMap));
 
-    // 4. Generate CSVs
+    // Generate CSVs
     const csvRentals = Papa.unparse(rentals);
     const csvExpenses = Papa.unparse(expenses);
     const csvSummary = Papa.unparse(
@@ -411,10 +414,10 @@ serve(async (_req) => {
       }))
     );
 
-    // 5. Generate PDF
+    // Generate PDF
     const pdfBuffer = await createPdfReport(rentals, expenses, summary);
 
-    // 6. Email it
+    // Send email
     const resend = new Resend(Deno.env.get("RESEND_API_KEY")!);
     await resend.emails.send({
       from: "Keith's Gown Rental <onboarding@resend.dev>",
@@ -441,30 +444,43 @@ serve(async (_req) => {
       ],
     });
 
-    // 7. Delete previous quarter data
-    console.log("Deleting Rentals between", from, "and", to);
-    const { data: checkRentals } = await supabase
+    // 🔥 Delete old records (with .select())
+    const { count: rentalCount, error: deleteRentalError } = await supabase
       .from("Rental")
-      .select("id, pickupDate")
+      .delete()
       .gte("pickupDate", from)
-      .lte("pickupDate", to);
-    console.log("Matched Rentals:", checkRentals.length);
+      .lte("pickupDate", to)
+      .select();
 
-    const { data: checkExpenses } = await supabase
+    const { count: expenseCount, error: deleteExpenseError } = await supabase
       .from("Expense")
-      .select("id, createdAt")
+      .delete()
       .gte("createdAt", from)
-      .lte("createdAt", to);
-    console.log("Matched Expenses:", checkExpenses.length);
+      .lte("createdAt", to)
+      .select();
+
+    if (deleteRentalError || deleteExpenseError) {
+      console.error(
+        "❌ Deletion error:",
+        deleteRentalError,
+        deleteExpenseError
+      );
+      throw new Error("Deletion failed");
+    }
+
+    console.log(`🧹 Deleted Rentals: ${rentalCount}`);
+    console.log(`🧹 Deleted Expenses: ${expenseCount}`);
 
     return new Response("✅ Email sent and data deleted!", { status: 200 });
   } catch (err) {
+    console.error("❌ Error in function:", err);
     return new Response(`Error occurred: ${err?.message || err?.toString()}`, {
       status: 500,
     });
   }
 });
 
+// PDF helper
 async function createPdfReport(
   rentals: any[],
   expenses: any[],
