@@ -435,16 +435,21 @@ serve(async (_req) => {
     });
 
     // 7. Delete previous quarter data
-    await supabase
+    const { count: rentalCount } = await supabase
       .from("Rental")
-      .delete()
+      .select("*", { count: "exact", head: true })
       .gte("pickupDate", new Date(from))
       .lte("pickupDate", new Date(to));
-    await supabase
+
+    const { count: expenseCount } = await supabase
       .from("Expense")
-      .delete()
-      .gte("pickupDate", new Date(from))
-      .lte("pickupDate", new Date(to));
+      .select("*", { count: "exact", head: true })
+      .gte("createdAt", new Date(from))
+      .lte("createdAt", new Date(to));
+
+    console.log(
+      `🧹 Deleting ${rentalCount} rentals and ${expenseCount} expenses...`
+    );
 
     return new Response("✅ Email sent and data deleted!", { status: 200 });
   } catch (err) {
