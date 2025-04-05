@@ -262,7 +262,11 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { PDFDocument, StandardFonts, rgb } from "https://esm.sh/pdf-lib@1.17.1";
 import Papa from "https://esm.sh/papaparse@5.4.1";
 import dayjs from "https://esm.sh/dayjs@1.11.10";
+import utc from "https://esm.sh/dayjs@1.11.10/plugin/utc.js";
 import { Resend } from "https://esm.sh/resend";
+
+// 👇 enable UTC plugin
+dayjs.extend(utc);
 
 serve(async (_req) => {
   const supabase = createClient(
