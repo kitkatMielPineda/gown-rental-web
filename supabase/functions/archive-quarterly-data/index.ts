@@ -295,10 +295,14 @@ serve(async (_req) => {
       return new Response("Not a scheduled archive month", { status: 400 });
     }
 
-    const from = `${year}-${String(startMonth).padStart(2, "0")}-01`;
+    const from = dayjs(`${year}-${String(startMonth).padStart(2, "0")}-01`)
+      .startOf("day")
+      .toISOString(); // 2025-01-01T00:00:00.000Z
+
     const to = dayjs(`${year}-${String(endMonth).padStart(2, "0")}-01`)
       .endOf("month")
-      .format("YYYY-MM-DD");
+      .endOf("day")
+      .toISOString(); // 2025-03-31T23:59:59.999Z
 
     // 2. Fetch Rental and Expense Data
     const { data: rentals, error: rentalError } = await supabase
