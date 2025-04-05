@@ -445,26 +445,35 @@ serve(async (_req) => {
     });
 
     // 🔥 Delete old records (with .select())
-    const { count: rentalCount, error: deleteRentalError } = await supabase
+    const {
+      data: deletedRentals,
+      count: rentalCount,
+      error: deleteRentalError,
+    } = await supabase
       .from("Rental")
       .delete()
       .gte("pickupDate", from)
       .lte("pickupDate", to)
-      .select();
+      .select("*", { count: "exact" });
 
-    const { count: expenseCount, error: deleteExpenseError } = await supabase
+    const {
+      data: deletedExpenses,
+      count: expenseCount,
+      error: deleteExpenseError,
+    } = await supabase
       .from("Expense")
       .delete()
       .gte("createdAt", from)
       .lte("createdAt", to)
-      .select();
+      .select("*", { count: "exact" });
+
+    console.log("Deleted Rentals:", deletedRentals);
+    console.log("Deleted Expenses:", deletedExpenses);
 
     if (deleteRentalError || deleteExpenseError) {
-      console.error(
-        "❌ Deletion error:",
-        deleteRentalError,
-        deleteExpenseError
-      );
+      console.error("❌ Deletion error details:");
+      console.error("Rental Error:", deleteRentalError);
+      console.error("Expense Error:", deleteExpenseError);
       throw new Error("Deletion failed");
     }
 
