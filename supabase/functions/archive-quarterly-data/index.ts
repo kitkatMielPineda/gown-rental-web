@@ -490,12 +490,12 @@ async function createPdfReport(
   );
 
   writeLine("\n== EXPENSES ==");
-  expenses.forEach((e) => writeLine(`${e.description}: ₱${e.amount}`));
+  expenses.forEach((e) => writeLine(`${e.description}: Php${e.amount}`));
 
   writeLine("\n== SUMMARY ==");
   summary.forEach((s) => {
     writeLine(
-      `${s.monthLabel} - Earnings: ₱${s.totalEarnings}, Expenses: ₱${s.totalExpenses}`
+      `${s.monthLabel} - Earnings: Php${s.totalEarnings}, Expenses: Php${s.totalExpenses}`
     );
   });
 
