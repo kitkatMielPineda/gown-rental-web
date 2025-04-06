@@ -473,9 +473,9 @@ serve(async (_req) => {
     if (deleteRentalError || deleteExpenseError) {
       console.error("❌ Deletion error details:");
       if (deleteRentalError)
-        console.error("Rental Delete Error:", deleteRentalError);
+        console.error("Rental Delete Error:", deleteRentalError.message);
       if (deleteExpenseError)
-        console.error("Expense Delete Error:", deleteExpenseError);
+        console.error("Expense Delete Error:", deleteExpenseError.message);
       throw new Error("Deletion failed");
     }
 
