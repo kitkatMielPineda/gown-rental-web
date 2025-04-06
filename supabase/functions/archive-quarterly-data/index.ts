@@ -472,11 +472,19 @@ serve(async (_req) => {
 
     if (deleteRentalError || deleteExpenseError) {
       console.error("❌ Deletion error details:");
-      if (deleteRentalError)
+      if (deleteRentalError) {
         console.error("Rental Delete Error:", deleteRentalError.message);
-      if (deleteExpenseError)
+      }
+      if (deleteExpenseError) {
         console.error("Expense Delete Error:", deleteExpenseError.message);
-      throw new Error("Deletion failed");
+      }
+
+      // 👇 Optional: include specific error in thrown message
+      throw new Error(
+        `Deletion failed: ${deleteRentalError?.message || ""} ${
+          deleteExpenseError?.message || ""
+        }`
+      );
     }
 
     console.log(`🧹 Deleted Rentals: ${rentalCount}`);
