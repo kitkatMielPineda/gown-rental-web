@@ -218,12 +218,12 @@ export default function Home() {
           Welcome to Keith's Gown Schedule
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 text-center">
-          <button
+          {/* <button
             className="bg-blue-500 text-white py-3 px-4 rounded-lg shadow hover:bg-blue-600"
             onClick={() => setIsScheduleTypeModalOpen(true)}
           >
             Add Schedule
-          </button>
+          </button> */}
           <button
             className="bg-green-500 text-white py-3 px-4 rounded-lg shadow hover:bg-green-600"
             onClick={() => (window.location.href = "/upcoming-rentals")}
@@ -272,7 +272,7 @@ export default function Home() {
         </div>
       </div>
       {/* Schedule Type Selection Modal */}
-      <Modal
+      {/* <Modal
         isOpen={isScheduleTypeModalOpen}
         onClose={() => setIsScheduleTypeModalOpen(false)}
         title="Choose Schedule Type"
@@ -297,7 +297,7 @@ export default function Home() {
             New Appointment
           </button>
         </div>
-      </Modal>
+      </Modal> */}
       {/* Rental Modal */}
       <Modal
         isOpen={isRentalModalOpen}
