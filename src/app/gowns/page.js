@@ -110,9 +110,11 @@ export default function GownListPage() {
           onChange={(e) => setSize(e.target.value)}
         >
           <option value="">All Sizes</option>
-          {["XS", "S", "M", "L", "XL", "2XL", "3XL", "kids"].map((s) => (
-            <option key={s}>{s}</option>
-          ))}
+          {["XS", "Small", "Medium", "Large", "XL", "2XL", "3XL", "kids"].map(
+            (s) => (
+              <option key={s}>{s}</option>
+            )
+          )}
         </select>
         <input
           type="text"
