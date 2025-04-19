@@ -215,7 +215,7 @@ export default function Home() {
       <Navbar />
       <div className="container mx-auto p-6">
         <h2 className="text-3xl font-bold mb-6 text-center">
-          Welcome to Keith's Gown Schedule
+          Welcome to Keith's Gown
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 text-center">
           {/* <button
@@ -224,6 +224,12 @@ export default function Home() {
           >
             Add Schedule
           </button> */}
+          <button
+            className="bg-pink-500 text-white py-3 px-4 rounded-lg shadow hover:bg-pink-600"
+            onClick={() => (window.location.href = "/gowns")}
+          >
+            List of Gowns
+          </button>
           <button
             className="bg-green-500 text-white py-3 px-4 rounded-lg shadow hover:bg-green-600"
             onClick={() => (window.location.href = "/upcoming-rentals")}
