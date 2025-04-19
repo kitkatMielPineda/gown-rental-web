@@ -72,3 +72,29 @@ enum PaymentMode {
   Metrobank
   Cash
 }
+
+model Gown {
+  id            String      @id @default(uuid())
+  codename      String
+  priceLow      Float
+  standardPrice Float
+  color         String
+  description   String?
+  types         GownType[]
+  sizes         GownSize[]
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model GownType {
+  id     String  @id @default(uuid())
+  name   String  @unique
+  gowns  Gown[]  
+}
+
+model GownSize {
+  id     String  @id @default(uuid())
+  label  String  @unique
+  gowns  Gown[] 
+}
+
