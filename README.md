@@ -24,6 +24,13 @@ A full-featured web application to streamline gown rental management, appointmen
 - Add and manage measurement or fitting appointments.
 - Reuses rental modal UI for a consistent experience.
 
+### ✨ Gown Listing with Search and Filters
+We've enhanced the application with a comprehensive gown listing feature:
+
+- Search Functionality: Quickly find gowns by their codename.
+- Filter Options: Narrow down your search using filters for gown type, size, and color.
+- Pagination: Efficiently navigate through the gown inventory with paginated results.
+
 ### 💰 Earnings & Expenses Tracker
 - Log income by payment mode:
   - GCASH, Maya, GoTyme, BPI, BDO, UnionBank, Metrobank, Cash
