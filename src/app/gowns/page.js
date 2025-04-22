@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import AddGownModal from "@/components/AddGownModal";
 import Link from "next/link";
 import EditGownModal from "@/components/EditGownModal";
+import { useDebounce } from "use-debounce";
 
 export default function GownListPage() {
   const [isOpen, setIsOpen] = useState(false);
@@ -16,16 +17,18 @@ export default function GownListPage() {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const pageSize = 20;
+  const [debouncedSearch] = useDebounce(search, 300);
+  const [debouncedColor] = useDebounce(color, 300);
 
   const fetchGowns = async () => {
     const params = new URLSearchParams({
       page: page.toString(),
       pageSize: pageSize.toString(),
     });
-    if (search) params.append("search", search);
+    if (debouncedSearch) params.append("search", debouncedSearch);
     if (type) params.append("type", type);
     if (size) params.append("size", size);
-    if (color) params.append("color", color);
+    if (debouncedColor) params.append("color", debouncedColor);
 
     const res = await fetch(`/api/gowns?${params.toString()}`);
     const data = await res.json();
@@ -35,7 +38,7 @@ export default function GownListPage() {
 
   useEffect(() => {
     fetchGowns();
-  }, [page, search, type, size, color]);
+  }, [page, debouncedSearch, type, size, debouncedColor]);
 
   const totalPages = Math.ceil(total / pageSize);
 
@@ -121,7 +124,7 @@ export default function GownListPage() {
           placeholder="Filter by Color"
           className="border p-2 rounded w-full"
           value={color}
-          onChange={(e) => setColor(e.target.value)}
+          onChange={(e) => setColor(e.target.value.trim().toLowerCase())}
         />
       </div>
 
