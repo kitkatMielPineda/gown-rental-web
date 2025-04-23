@@ -63,3 +63,39 @@ export async function GET(req) {
     );
   }
 }
+
+export async function POST(req) {
+  try {
+    const body = await req.json();
+    const {
+      codename,
+      priceLow,
+      standardPrice,
+      color,
+      description,
+      types,
+      sizes,
+    } = body;
+
+    const newGown = await prisma.gown.create({
+      data: {
+        codename,
+        priceLow: parseFloat(priceLow),
+        standardPrice: parseFloat(standardPrice),
+        color,
+        description: description || null,
+        types: {
+          connect: types.map((typeName) => ({ name: typeName })),
+        },
+        sizes: {
+          connect: sizes.map((sizeLabel) => ({ label: sizeLabel })),
+        },
+      },
+    });
+
+    return NextResponse.json(newGown, { status: 201 });
+  } catch (error) {
+    console.error("Gown Save Error:", error);
+    return NextResponse.json({ error: "Failed to save gown" }, { status: 500 });
+  }
+}
