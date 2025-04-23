@@ -19,6 +19,8 @@ export default function GownListPage() {
   const pageSize = 20;
   const [debouncedSearch] = useDebounce(search, 300);
   const [debouncedColor] = useDebounce(color, 300);
+  const [gownTypes, setGownTypes] = useState([]);
+  const [gownSizes, setGownSizes] = useState([]);
 
   const fetchGowns = async () => {
     const params = new URLSearchParams({
@@ -35,6 +37,25 @@ export default function GownListPage() {
     setGowns(data.gowns);
     setTotal(data.total);
   };
+
+  useEffect(() => {
+    const fetchFilterOptions = async () => {
+      try {
+        const resTypes = await fetch("/api/gown-types");
+        const resSizes = await fetch("/api/gown-sizes");
+
+        const types = await resTypes.json();
+        const sizes = await resSizes.json();
+
+        setGownTypes(types);
+        setGownSizes(sizes);
+      } catch (err) {
+        console.error("Error fetching filter options:", err);
+      }
+    };
+
+    fetchFilterOptions();
+  }, []);
 
   useEffect(() => {
     fetchGowns();
@@ -91,33 +112,28 @@ export default function GownListPage() {
           onChange={(e) => setSearch(e.target.value)}
         />
         <select
-          className="border p-2 rounded w-full"
+          className="border p-2 rounded w-full max-h-48 overflow-y-auto"
           value={type}
           onChange={(e) => setType(e.target.value)}
         >
           <option value="">All Types</option>
-          {[
-            "Ball Gown",
-            "Mermaid/Trumpet",
-            "A-Line",
-            "Bridgerton",
-            "Longtrain Prenup",
-            "With Train",
-          ].map((t) => (
-            <option key={t}>{t}</option>
+          {gownTypes.map((t) => (
+            <option key={t.id} value={t.name}>
+              {t.name}
+            </option>
           ))}
         </select>
         <select
-          className="border p-2 rounded w-full"
+          className="border p-2 rounded w-full max-h-48 overflow-y-auto"
           value={size}
           onChange={(e) => setSize(e.target.value)}
         >
           <option value="">All Sizes</option>
-          {["XS", "Small", "Medium", "Large", "XL", "2XL", "3XL", "kids"].map(
-            (s) => (
-              <option key={s}>{s}</option>
-            )
-          )}
+          {gownSizes.map((s) => (
+            <option key={s.id} value={s.label}>
+              {s.label}
+            </option>
+          ))}
         </select>
         <input
           type="text"
