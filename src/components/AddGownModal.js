@@ -74,7 +74,7 @@ export default function AddGownModal({ isOpen, onClose }) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded shadow-md w-full max-w-xl">
+      <div className="bg-white p-6 rounded shadow-md w-full max-w-xl max-h-[90vh] overflow-y-auto">
         <h2 className="text-xl font-semibold mb-4">Add New Gown</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
